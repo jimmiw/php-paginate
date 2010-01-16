@@ -1,0 +1,40 @@
+h1. Paginate a Pagination component for PHP
+
+This component has two files.
+*Paginate.inc.php*
+It is used in the controller (if speaking MVC terms) and sets up some
+convinience methods for you to use.
+
+*PaginateViewHelper.inc.php*
+It is used to render a pagination bar.
+
+NOTE: this component currently relies on MySQL, so remember to set up your
+connections before using it in your code!
+
+You have to tell the component what page we are currently on and what table
+your data is to be taken from. This is "all" you need to do.
+
+h1. Example
+
+For simplisity, i'll just use a single file called index.php
+<pre><code>
+<?php
+
+// make your connection to the database
+
+// initializes the pagination lib
+$paginate = new Paginate("posts", $current_page, $items_per_page);
+
+// use the paginate view helper to make the pagination bar
+$paginateViewHelper = new PaginateViewHelper(
+  $paginate->getCurrentPage(), // the current page we are on, e.g. 1
+  $paginate->getItemsPerPage(), // number of items per page, e.g. 5
+  "/blog/page/" // the link to have before the page number
+);
+
+// renders the pagination bar. Only needs to know to total amount of pages
+// this can be taken from the $paginate object.
+echo $paginateViewHelper->render($paginate->getTotalPages());
+
+?>
+</code></pre>
