@@ -17,13 +17,16 @@ your data is to be taken from. This is "all" you need to do.
 h1. Example
 
 For simplisity, i'll just use a single file called index.php
-<pre><code>
-<?php
+<pre><code><?php
 
 // make your connection to the database
 
 // initializes the pagination lib
-$paginate = new Paginate("posts", $current_page, $items_per_page);
+$paginate = new Paginate(
+  "posts", // the table name in your database to find ALL items from
+  $current_page, // the current page
+  $items_per_page // number of items per page
+);
 
 // use the paginate view helper to make the pagination bar
 $paginateViewHelper = new PaginateViewHelper(
