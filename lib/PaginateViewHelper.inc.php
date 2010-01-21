@@ -6,18 +6,40 @@
  * NOTE: Only works with MySQL atm!
  */
 class PaginateViewHelper {
-  private $current_page;
-  private $items_per_page;
-  private $link;
+  private $currentPage;
+  private $itemsPerPage;
+  private $linkPrefix;
+  private $totalItems;
+  private $nextText;
+  private $previousText;
   
   /**
    * initializes the paginate class, using a default value of
    * 10 items per page displayed.
    */
-  public function __construct($current_page = 1, $items_per_page = 10, $link = "/page/") {
-    $this->current_page = $current_page;
-    $this->items_per_page = $items_per_page;
-    $this->link = $link;
+  public function __construct($currentPage = 1, $itemsPerPage = 10, $totalItems, $linkPrefix = "/page/") {
+    $this->currentPage = $currentPage;
+    $this->itemsPerPage = $itemsPerPage;
+    $this->linkPrefix = $linkPrefix;
+    $this->totalItems = $totalItems;
+    $this->nextText = "Next &raquo;";
+    $this->previousText = "&laquo; Previous";
+  }
+  
+  /** 
+   * Sets the text to be displayed in the next link
+   * @param $text, the text to be displayed instead of the standard text
+   */
+  public function setNextText($text) {
+    $this->nextText = $text;
+  }
+  
+  /** 
+   * Sets the text to be displayed in the previous link
+   * @param $text, the text to be displayed instead of the standard text
+   */
+  public function setPreviousText($text) {
+    $this->previousText = $text;
   }
   
   /**
@@ -34,7 +56,7 @@ class PaginateViewHelper {
    * 
    * @params $count, the total amount of items.
    */
-  public function render($count) {
+  public function render() {
     // @params $table_name, the name of the table to do the pagination on.
     // finds the total amount of items
     /*$row = mysql_fetch_array(mysql_query("select count(*) from ".$table_name));
@@ -43,21 +65,21 @@ class PaginateViewHelper {
     // finds the total amount of pages, using the number of items, dividing them
     // by the number of items per page.
     // uses a round to make it a pretty integer
-    $total_page_count = round($count / $this->items_per_page);
+    $totalPageCount = round($this->totalItems / $this->itemsPerPage);
     
     // constructs the html to use for the pagination view.
     $html = "<ul class=\"paginate\">";
     // if it's not the first page, then add a < link
-    if($this->current_page > 1) {
-      $html .= $this->createLink(1, "<");
+    if($this->currentPage > 1) {
+      $html .= $this->createLink(1, $this->previousText, false);
     }
     // adds the page links, one by one
-    for($i = 1; $i <= $total_page_count; $i++) {
-      $html .= $this->createLink($i, $pretty_url);
+    for($i = 1; $i <= $totalPageCount; $i++) {
+      $html .= $this->createLink($i);
     }
     // if it's not the last page, then add a > link
-    if($this->current_page < $total_page_count) {
-      $html .= $this->createLink(($this->current_page + 1), ">");
+    if($this->currentPage < $totalPageCount) {
+      $html .= $this->createLink(($this->currentPage + 1), $this->nextText, false);
     }
     
     $html .= "</ul>";
@@ -70,22 +92,22 @@ class PaginateViewHelper {
    * @param $link_value, defaults to null, use this for other link display name.
    * @returns the link created, with the LI tags.
    */
-  private function createLink($page_number, $link_value = null) {
+  private function createLink($pageNumber, $linkValue = null, $colorSelected = true) {
     // if no different link_value was set, use the page number.
-    if($link_value == null) {
-      $link_value = $page_number;
+    if($linkValue == null) {
+      $linkValue = $pageNumber;
     }
   
-    $html_link = "<li><a href=\"".$this->link.$page_number."\"";
+    $htmlLink = "<li><a href=\"".$this->linkPrefix.$pageNumber."\"";
     
     // if the current page and page number are equal, add a selected class
-    if($page_number == $this->current_page) {
-      $html_link .= " class=\"selected\"";
+    if($pageNumber == $this->currentPage && $colorSelected) {
+      $htmlLink .= " class=\"selected\"";
     }
     
-    $html_link .= ">".$link_value."</a></li>";
+    $htmlLink .= ">".$linkValue."</a></li>";
     
-    return $html_link;
+    return $htmlLink;
   }
 }
 
